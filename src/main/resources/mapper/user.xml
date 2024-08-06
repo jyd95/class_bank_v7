@@ -8,7 +8,7 @@
 	
 	<insert id="insert">
 		insert into user_tb(username, password, fullname, created_at)
-		values( #{username}, #{password}, #{fullname}, #{createdAt} )
+		values(#{username}, #{password}, #{fullname}, now())
 	</insert>
 	
 	<update id="updateById">
@@ -27,7 +27,7 @@
 		where id = #{id}
 	</select>
 	
-	<select id="findAll" resultMap="com.tenco.bank.repository.model.User">
+	<select id="findAll" resultType="com.tenco.bank.repository.model.User">
 		select * from user_tb
 	</select>
 	
