@@ -1,6 +1,5 @@
 package com.tenco.bank.service;
 
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
@@ -44,7 +43,6 @@ public class UserService {
 			e.printStackTrace();
 			throw new RedirectException("알 수 없는 오류.", HttpStatus.SERVICE_UNAVAILABLE);
 		}
-		
 		if(result != 1) {
 			throw new DataDeleveryException("회원가입 실패", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
