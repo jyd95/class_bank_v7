@@ -1,5 +1,7 @@
 package com.tenco.bank.service;
 
+import java.time.zone.ZoneOffsetTransitionRule.TimeDefinition;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
@@ -12,6 +14,7 @@ import com.tenco.bank.handler.exception.DataDeleveryException;
 import com.tenco.bank.handler.exception.RedirectException;
 import com.tenco.bank.repository.interfaces.UserRepository;
 import com.tenco.bank.repository.model.User;
+import com.tenco.bank.utils.Define;
 
 @Service // IoC의 대상(싱글톤 패턴으로 관리됨)
 public class UserService {
@@ -38,13 +41,13 @@ public class UserService {
 		try {
 			result = userRepository.insert(dto.toUser());
 		} catch (DataAccessException e) {
-			throw new DataDeleveryException("중복된 이름입니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+			throw new DataDeleveryException(Define.EXIST_NAME, HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new RedirectException("알 수 없는 오류.", HttpStatus.SERVICE_UNAVAILABLE);
+			throw new RedirectException(Define.UNKNOWN, HttpStatus.SERVICE_UNAVAILABLE);
 		}
 		if(result != 1) {
-			throw new DataDeleveryException("회원가입 실패", HttpStatus.INTERNAL_SERVER_ERROR);
+			throw new DataDeleveryException(Define.FAIL_TO_CREATE_USER, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 	}

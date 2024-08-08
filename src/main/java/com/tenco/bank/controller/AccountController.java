@@ -11,11 +11,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.tenco.bank.dto.SaveDTO;
+import com.tenco.bank.dto.WithdrawalDTO;
 import com.tenco.bank.handler.exception.DataDeleveryException;
 import com.tenco.bank.handler.exception.UnAuthorizedException;
 import com.tenco.bank.repository.model.Account;
 import com.tenco.bank.repository.model.User;
 import com.tenco.bank.service.AccountService;
+import com.tenco.bank.utils.Define;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -23,7 +25,6 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/account")
 public class AccountController {
 	
-	// 계좌 생성 화면 요청
 	@Autowired
 	private final HttpSession session;
 	@Autowired
@@ -43,10 +44,9 @@ public class AccountController {
 	@GetMapping("/save")
 	public String savePage() {
 		
-		// 1. 인증검사 필요 (account 전체)
-		User principal = (User)session.getAttribute("principal");
+		User principal = (User)session.getAttribute(Define.PRINCIPAL);
 		if(principal == null) {
-			throw new UnAuthorizedException("인증된 사용자가 아닙니다.", HttpStatus.UNAUTHORIZED);
+			throw new UnAuthorizedException(Define.NOT_AN_AUTHENTICATED_USER, HttpStatus.UNAUTHORIZED);
 		}
 			
 		return "account/save";
@@ -59,18 +59,18 @@ public class AccountController {
 	 */
 	@PostMapping("/save")
 	public String saveProc(SaveDTO dto) {
-		User principal = (User)session.getAttribute("principal");
+		User principal = (User)session.getAttribute(Define.PRINCIPAL);
 		if(principal == null) {
-			throw new UnAuthorizedException("인증된 사용자가 아닙니다.", HttpStatus.UNAUTHORIZED);
+			throw new UnAuthorizedException(Define.NOT_AN_AUTHENTICATED_USER, HttpStatus.UNAUTHORIZED);
 		}
 		if(dto.getNumber() == null || dto.getNumber().isEmpty()) {
-			throw new DataDeleveryException("계좌번호를 입력하시오", HttpStatus.BAD_REQUEST);
+			throw new DataDeleveryException(Define.ENTER_YOUR_ACCOUNT_NUMBER, HttpStatus.BAD_REQUEST);
 		}
 		if(dto.getPassword() == null || dto.getPassword().isEmpty()) {
-			throw new DataDeleveryException("비밀번호를 입력하시오", HttpStatus.BAD_REQUEST);
+			throw new DataDeleveryException(Define.ENTER_YOUR_PASSWORD, HttpStatus.BAD_REQUEST);
 		}
 		if(dto.getBalance() == null || dto.getBalance() < 0) {
-			throw new DataDeleveryException("잔액 입력이 잘못되었습니다.", HttpStatus.BAD_REQUEST);
+			throw new DataDeleveryException(Define.ENTER_YOUR_BALANCE, HttpStatus.BAD_REQUEST);
 		}
 		
 		accountService.createAccount(dto, principal.getId());
@@ -86,25 +86,64 @@ public class AccountController {
 	@GetMapping({"/list", "/"})
 	public String listPage(Model model) {
 		
-		
-		// 1. 인증검사
-		User principal = (User)session.getAttribute("principal");
+		User principal = (User)session.getAttribute(Define.PRINCIPAL);
 		if(principal == null) {
-			throw new UnAuthorizedException("인증된 사용자가 아닙니다.", HttpStatus.UNAUTHORIZED);
+			throw new UnAuthorizedException(Define.NOT_AN_AUTHENTICATED_USER, HttpStatus.UNAUTHORIZED);
 		}
-		// 2. 유효성 검사 X
-		// 3. 서비스 호출
 		List<Account> accountList = accountService.readAccountListByUserId(principal.getId());
 		if(accountList.isEmpty()) {
 			model.addAttribute("accountList", null);
 		}else {
 			model.addAttribute("accountList", accountList);
 		}
-		// JSP 데이터를 넣어주는 방법
 		return "account/list";
 	}
 	
+	/**
+	 * 출금 페이지 요청
+	 * @return withdrawal.jsp;
+	 */
+	@GetMapping("/withdrawal")
+	public String withdrawalPage() {
+		User principal = (User)session.getAttribute(Define.PRINCIPAL);
+		if(principal == null) {
+			throw new UnAuthorizedException(Define.NOT_AN_AUTHENTICATED_USER, HttpStatus.UNAUTHORIZED);
+		}
+		return "account/withdrawal";
+	}
 	
+	/**
+	 * 
+	 * @return
+	 */
+	@PostMapping("/withdrawal")
+	public String withdrawalProc(WithdrawalDTO dto) {
+		User principal = (User)session.getAttribute(Define.PRINCIPAL);
+		if(principal == null) {
+			throw new UnAuthorizedException(Define.NOT_AN_AUTHENTICATED_USER, HttpStatus.UNAUTHORIZED);
+		}
+		
+		// 유효성 검사 (자바 코드를 개발) --> 스프링 부트 @Valid 라이브러리 존재
+		if(dto.getAmount() == null ) {
+			throw new DataDeleveryException(Define.ENTER_YOUR_BALANCE, HttpStatus.BAD_REQUEST);
+		}
+		if(dto.getAmount().longValue() <= 0) {
+			throw new DataDeleveryException(Define.W_BALANCE_VALUE, HttpStatus.BAD_REQUEST);
+		}
+		if(dto.getWAccountNumber() == null) {
+			throw new DataDeleveryException(Define.ENTER_YOUR_ACCOUNT_NUMBER, HttpStatus.BAD_REQUEST);
+		}
+		if(dto.getWAccountPassword() == null || dto.getWAccountPassword().isEmpty()) {
+			throw new DataDeleveryException(Define.ENTER_YOUR_PASSWORD, HttpStatus.BAD_REQUEST);
+		}
+		
+		accountService.updateAccountWithdraw(dto, principal.getId());
+			
+		
+		
+		
+		return "redirect:/account/list";
+	}
 	
 	
 }

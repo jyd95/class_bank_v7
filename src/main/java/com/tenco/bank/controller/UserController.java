@@ -10,34 +10,33 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.tenco.bank.dto.SignInDTO;
 import com.tenco.bank.dto.SignUpDTO;
 import com.tenco.bank.handler.exception.DataDeleveryException;
-import com.tenco.bank.repository.interfaces.UserRepository;
 import com.tenco.bank.repository.model.User;
 import com.tenco.bank.service.UserService;
+import com.tenco.bank.utils.Define;
 
 import jakarta.servlet.http.HttpSession;
 
-@Controller // IoC의 대상 (싱글톤 패턴으로 관리됨)
-@RequestMapping("/user") // 대문 맵핑 처리
+@Controller 
+@RequestMapping("/user") 
 public class UserController {
 	
 	private UserService userService;
 	
 	private final HttpSession session;
 	
-	// DI 처리 
-	@Autowired // 노란색 경고는 사용할 필요 없음 - 가독성 위해서 선언해도 됨
+	
+	@Autowired 
 	public UserController(UserService service, HttpSession session) {
 		this.userService = service;
 		this.session = session;
 	}
 	/**
-	 * 회원 가입 페이지 요청 주소 설계 : http://localhost:8080/user/sign-up
-	 * 
+	 * 회원 가입 페이지 요청 
+	 * 주소 설계 : http://localhost:8080/user/sign-up
 	 * @return signUp.jsp
 	 */
 	@GetMapping("/sign-up")
 	public String signUpPage() {
-		// prefix + return + suffix ==> /WEB-INF ... signUp.jsp
 		return "user/signUp";
 	}
 
@@ -49,28 +48,21 @@ public class UserController {
 	 */
 	@PostMapping("/sign-up")
 	public String signUpProc(SignUpDTO dto) {
-		System.out.println("test :  " + dto.toString());
-
-		// controller 에서 일반적인 코드 작업
-		// 1. 인증검사 (회원가입 에서는 불필요)
-		// 2. 유효성 검사
 
 		if (dto.getUsername() == null || dto.getUsername().isEmpty()) {
-			throw new DataDeleveryException("username 을 입력하세요", HttpStatus.BAD_REQUEST);
+			throw new DataDeleveryException(Define.ENTER_YOUR_USERNAME, HttpStatus.BAD_REQUEST);
 		}
 
 		if (dto.getPassword() == null || dto.getPassword().isEmpty()) {
-			throw new DataDeleveryException("password 를 입력하세요", HttpStatus.BAD_REQUEST);
+			throw new DataDeleveryException(Define.ENTER_YOUR_PASSWORD, HttpStatus.BAD_REQUEST);
 		}
 
 		if (dto.getFullname() == null || dto.getFullname().isEmpty()) {
-			throw new DataDeleveryException("fullname 을 입력하세요", HttpStatus.BAD_REQUEST);
+			throw new DataDeleveryException(Define.ENTER_YOUR_FULLNAME, HttpStatus.BAD_REQUEST);
 		}
 
-		// 서비스 객체로 전달
 		userService.createUser(dto);
 		
-		// TODO - 추후 수정
 		return "redirect:/user/sign-in";
 	}
 	
@@ -80,32 +72,29 @@ public class UserController {
 	 */
 	@GetMapping("/sign-in")
 	public String signInPage() {
-		// 인증검사 	x
-		// 유효성 검사	x
 		return "user/signIn";
 	}
 	
+	/**
+	 * 로그인 요청 처리
+	 * @param dto
+	 * @return
+	 */
 	@PostMapping("/sign-in")
 	public String signProc(SignInDTO dto) {
-		
-		// 1. 인증검사 필요X
-		// 2. 유효성검사 필요O
+
 		if(dto.getUsername() == null || dto.getUsername().isEmpty()) {
-			throw new DataDeleveryException("username 을 입력하시오", HttpStatus.BAD_REQUEST);
+			throw new DataDeleveryException(Define.ENTER_YOUR_USERNAME, HttpStatus.BAD_REQUEST);
 		}
 		if(dto.getPassword() == null || dto.getPassword().isEmpty()) {
-			throw new DataDeleveryException("password 를 입력하시오", HttpStatus.BAD_REQUEST);
+			throw new DataDeleveryException(Define.ENTER_YOUR_PASSWORD, HttpStatus.BAD_REQUEST);
 		}
 		
-		// 서비스 호출
 		User principal = userService.readUser(dto);
+
+		session.setAttribute(Define.PRINCIPAL, principal);
 		
-		// 세션 메모리에 등록 처리
-		session.setAttribute("principal", principal);
-		
-		// 새로운 페이지로 이동 처리
-		// TODO 계좌 목록 페이지 이동 처리 예정
-		return "redirect:/index";
+		return "redirect:/account/list";
 	}
 	
 	@GetMapping("/logout")
