@@ -4,6 +4,7 @@
 <%@ include file='/WEB-INF/view/layout/header.jsp'%>
 
 
+
 <!-- start of content.jsp(xxx.jsp) -->
 <div class="col-sm-8">
 	<h2>계좌 상세 보기(인증)</h2>
@@ -11,7 +12,7 @@
 	
 	<div class="bg-light p-md-5">
 		<div class="user--box">
-			${principal.username}님의 계좌<br> 계좌번호 : ${account.number} <br> 잔액 : ${account.balance}원 
+			${principal.username}님의 계좌<br> 계좌번호 : ${account.number} <br> 잔액 : ${account.formatKoreanWon(account.balance)} 
 		</div>
 		<br>
 		<div>
@@ -31,13 +32,13 @@
 				</tr>
 			</thead>
 			<tbody>
-				<c:forEach var="history" items="${historyList}">
+				<c:forEach var="historyAccount" items="${historyList}">
 				<tr>
-					<th>${history.createdAt}</th>					
-					<th>${history.sender}</th>					
-					<th>${history.receiver}</th>					
-					<th>${history.amount}</th>					
-					<th>${history.balance}</th>					
+					<th>${historyAccount.timestampToString(historyAccount.createdAt)}</th>					
+					<th>${historyAccount.sender}</th>					
+					<th>${historyAccount.receiver}</th>					
+					<th>${historyAccount.formatKoreanWon(historyAccount.amount)}</th>					
+					<th>${historyAccount.formatKoreanWon(historyAccount.balance)}</th>					
 				</tr>
 				</c:forEach>
 			</tbody>
