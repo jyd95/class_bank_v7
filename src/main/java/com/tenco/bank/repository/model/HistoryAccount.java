@@ -14,13 +14,11 @@ import lombok.ToString;
 @ToString
 @Builder
 
-public class History {
+public class HistoryAccount {
 	private Integer id;
 	private Long amount;
-	private Long wBalance;
-	private Long dBalance;
-	private Integer wAccountId;
-	private Integer dAccountId;
+	private Long balance;
+	private String sender;
+	private String receiver;
 	private Timestamp createdAt;
-	
 }

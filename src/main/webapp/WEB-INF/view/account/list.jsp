@@ -20,13 +20,13 @@
 					</tr>
 				</thead>
 				<tbody>
-					<c:forEach var="account" items="${accountList}">
+					<c:forEach  var="account"   items="${accountList}">
 						<tr>
-							<td>${account.number}</td>
+							<td><a href="/account/detail/${account.id}?type=all">${account.number}</a></td>
 							<td>${account.balance}</td>
 						</tr>
 					</c:forEach>
-				</tbody>
+				</tbody>	
 			</table>
 		</c:when>
 		<c:otherwise>

@@ -16,7 +16,7 @@ import com.tenco.bank.utils.Define;
 
 import jakarta.servlet.http.HttpSession;
 
-@Controller 
+@Controller
 @RequestMapping("/user") 
 public class UserController {
 	
