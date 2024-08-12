@@ -2,6 +2,8 @@ package com.tenco.bank.repository.model;
 
 import java.sql.Timestamp;
 
+import com.tenco.bank.utils.ValueFormatter;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +16,7 @@ import lombok.ToString;
 @ToString
 @Builder
 
-public class HistoryAccount {
+public class HistoryAccount extends ValueFormatter{
 	private Integer id;
 	private Long amount;
 	private Long balance;
