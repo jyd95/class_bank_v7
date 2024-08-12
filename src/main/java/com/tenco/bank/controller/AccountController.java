@@ -234,7 +234,11 @@ public class AccountController {
 	 * @return
 	 */
 	@GetMapping("/detail/{accountId}")
-	public String detail(@PathVariable(name = "accountId") Integer accountId, @RequestParam(required = false, name ="type")  String type, Model model) {
+	public String detail(@PathVariable(name = "accountId") Integer accountId, 
+						@RequestParam(required = false, name ="type") String type,
+						@RequestParam(name ="page", defaultValue = "1") int page,
+						@RequestParam(name ="siez", defaultValue = "2") int size, 
+						Model model) {
 		
 		User principal = (User)session.getAttribute(Define.PRINCIPAL);
 		if(principal == null) {
@@ -250,10 +254,20 @@ public class AccountController {
 			throw new DataDeleveryException("유효하지 않은 접근입니다.", HttpStatus.BAD_REQUEST);
 		}
 		
+		// 페이지 갯수 계산
+		int totalRecords = accountService.countHistoryByAccountIdAndType(type, accountId);
+		int totalPages = (int)Math.ceil((double) totalRecords / size);
+		
 		Account account = accountService.readAccountById(accountId);
-		List<HistoryAccount> historyList = accountService.readHistoryByAccountId(type, accountId);
+		List<HistoryAccount> historyList = accountService.readHistoryByAccountId(type, accountId, page, size);
+		
+		
 		model.addAttribute("account", account);
 		model.addAttribute("historyList", historyList);
+		model.addAttribute("curruntPage", page);
+		model.addAttribute("totalPages", totalPages);
+		model.addAttribute("type", type);
+		model.addAttribute("size", size);
 		return "account/detail";
 	}
 }
