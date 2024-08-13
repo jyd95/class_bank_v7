@@ -23,6 +23,7 @@ public interface UserRepository {
 	// !주의 매개변수가 2개 이상일 시 반드시 @Param 어노테이션을 사용해 주어야 한다.
 	public User findByUsernameAndPassword(@Param("username")String username, @Param("password")String password);
 	
+	public User findByUsername(@Param("username")String username);
 	
 	
 }

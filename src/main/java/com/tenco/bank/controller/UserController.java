@@ -15,21 +15,18 @@ import com.tenco.bank.service.UserService;
 import com.tenco.bank.utils.Define;
 
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 
 @Controller
-@RequestMapping("/user") 
+@RequestMapping("/user")
+@RequiredArgsConstructor
 public class UserController {
 	
+	@Autowired
 	private UserService userService;
-	
+	@Autowired
 	private final HttpSession session;
 	
-	
-	@Autowired 
-	public UserController(UserService service, HttpSession session) {
-		this.userService = service;
-		this.session = session;
-	}
 	/**
 	 * 회원 가입 페이지 요청 
 	 * 주소 설계 : http://localhost:8080/user/sign-up

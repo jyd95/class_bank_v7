@@ -22,18 +22,16 @@ import com.tenco.bank.repository.model.History;
 import com.tenco.bank.repository.model.HistoryAccount;
 import com.tenco.bank.utils.Define;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class AccountService {
 	
 	@Autowired
 	private final AccountRepository accountRepository;
 	private final HistoryRepository historyRepository;
 	
-	@Autowired
-	public AccountService(AccountRepository accountRepository, HistoryRepository historyRepository) {
-		this.accountRepository = accountRepository;
-		this.historyRepository = historyRepository;
-	}
 	
 	/**
 	 * 계좌 생성 기능

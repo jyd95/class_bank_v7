@@ -27,8 +27,10 @@ import com.tenco.bank.service.AccountService;
 import com.tenco.bank.utils.Define;
 
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 
 @Controller // IoC 대상 (싱글톤으로 관리)
+@RequiredArgsConstructor
 @RequestMapping("/account")
 public class AccountController {
 	
@@ -37,10 +39,6 @@ public class AccountController {
 	@Autowired
 	private final AccountService accountService;
 	
-	public AccountController(AccountService accountService,HttpSession session) {
-		this.session = session;
-		this.accountService = accountService;
-	}
 	
 	/**
 	 * 계좌 생성 페이지 요청
