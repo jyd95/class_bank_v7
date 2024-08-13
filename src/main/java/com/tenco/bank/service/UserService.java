@@ -37,7 +37,9 @@ public class UserService {
 	public void createUser(SignUpDTO dto) {
 
 		int result = 0;
-
+		
+		System.out.println(dto.getMFile().getOriginalFilename());
+		
 		try {
 			
 			// 코드 추가 부분
@@ -45,7 +47,7 @@ public class UserService {
 			String hashPwd = passwordEncoder.encode(dto.getPassword());
 			System.out.println("hashPwd : " + hashPwd);
 			dto.setPassword(hashPwd);
-			result = userRepository.insert(dto.toUser());
+			//result = userRepository.insert(dto.toUser());
 		} catch (DataAccessException e) {
 			throw new DataDeleveryException(Define.EXIST_NAME, HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (Exception e) {

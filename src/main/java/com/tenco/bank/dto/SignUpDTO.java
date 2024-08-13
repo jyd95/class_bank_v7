@@ -1,5 +1,7 @@
 package com.tenco.bank.dto;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.tenco.bank.repository.model.User;
 
 import lombok.AllArgsConstructor;
@@ -16,6 +18,10 @@ public class SignUpDTO {
 	private String username;
 	private String password;
 	private String fullname;
+	private MultipartFile mFile;
+	private String originFileName;
+	private String uploadFileName;
+	
 	
 	// 2단계 로직
 	public User toUser() {
@@ -23,10 +29,11 @@ public class SignUpDTO {
 					.username(this.username)
 					.password(this.password)
 					.fullname(this.fullname)
+					.originFileName(this.originFileName)
+					.uploadFileName(this.uploadFileName)
 					.build();
 	}
 	
 	
-	// TODO - 추후 사진 업로드 기능 추가 예정
 	
 }

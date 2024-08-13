@@ -10,6 +10,11 @@ spring:
     view:
       prefix: /WEB-INF/view/ #JSP 파일이 위치한 디렉토리 접두사 설정 
       suffix: .jsp #VIEW 이름에 자동으로 추가될 파일 확장자 설정
+  servlet:
+    multipart:
+      max-file-size: 20MB #업로드 파일의 최대 크기는 20MB
+      max-request-size: 20MB #멀티파트 전체 요청의 크기는 20MB
+        
   datasource:
     url: jdbc:mysql://localhost:3306/mybank?serverTimezone=Asia/Seoul  # 데이터베이스 연결을 위한 URL을 설정합니다.
     driver-class-name: com.mysql.cj.jdbc.Driver  # JDBC 드라이버 클래스를 설정합니다.
