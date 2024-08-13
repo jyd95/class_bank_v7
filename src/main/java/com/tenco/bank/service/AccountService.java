@@ -211,10 +211,16 @@ public class AccountService {
 	 * @return 전체 , 입금, 출금 / 내역 3가지 타입 반환 -> detail.jsp
 	 */
 	@Transactional
-	public List<HistoryAccount> readHistoryByAccountId(String type, Integer accountId){
+	public List<HistoryAccount> readHistoryByAccountId(String type, Integer accountId, int page, int size){
 		List<HistoryAccount> list = new ArrayList<>();
-		list = historyRepository.findByAccountIdAndTypeOfHistory(type, accountId);
+		int limit = size;
+		int offset = (page -1) * size;
+		list = historyRepository.findByAccountIdAndTypeOfHistory(type, accountId, limit, offset);
 		return list;
+	}
+
+	public int countHistoryByAccountIdAndType(String type, Integer accountId) {
+		return historyRepository.countByAccountIdAndType(type, accountId);
 	}
 	
 	

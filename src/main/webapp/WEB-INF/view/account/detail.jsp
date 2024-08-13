@@ -43,6 +43,32 @@
 				</c:forEach>
 			</tbody>
 		</table>
+		<br>
+		<!-- pagenation -->
+		<div class="d-flex justify-content-center">
+			<ul class="pagination">
+				<!-- previous Page Link -->
+				<li class="page-item <c:if test='${curruntPage == 1}'>disabled</c:if>">
+				<a class="page-link" href="?type=${type}&page=1&size=${size}">First Page</a>
+				</li>
+				<li class="page-item <c:if test='${curruntPage == 1}'>disabled</c:if>">
+				<a class="page-link" href="?type=${type}&page=${curruntPage-1}&size=${size}">Previous</a>
+				</li>
+				<!-- Page Numbers -->
+				<c:forEach begin="1" end="${totalPages}" var="page">
+				<li class="page-item <c:if test='${page == curruntPage}'>active</c:if>">
+					<a class="page-link" href="?type=${type}&page=${page}&size=${size}">${page}</a>
+				</li>
+				</c:forEach>
+				<!-- next Page Link -->
+				<li class="page-item <c:if test='${curruntPage == totalPages}'>disabled</c:if>">
+					<a class="page-link" href="?type=${type}&page=${curruntPage+1}&size=${size}">Next</a>
+				</li>
+				<li class="page-item <c:if test='${curruntPage == totalPages}'>disabled</c:if>">
+					<a class="page-link" href="?type=${type}&page=${totalPages}&size=${size}">Last Page</a>
+				</li>
+			</ul>
+		</div>
 	</div>
 	
 
