@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.tenco.bank.dto.DepositDTO;
 import com.tenco.bank.dto.SaveDTO;
@@ -36,7 +37,6 @@ public class AccountController {
 	@Autowired
 	private final AccountService accountService;
 	
-	@Autowired
 	public AccountController(AccountService accountService,HttpSession session) {
 		this.session = session;
 		this.accountService = accountService;
@@ -64,25 +64,23 @@ public class AccountController {
 	 * @return
 	 */
 	@PostMapping("/save")
-	public String saveProc(SaveDTO dto) {
-		User principal = (User)session.getAttribute(Define.PRINCIPAL);
-		if(principal == null) {
-			throw new UnAuthorizedException(Define.NOT_AN_AUTHENTICATED_USER, HttpStatus.UNAUTHORIZED);
-		}
+	public String saveProc(SaveDTO dto, @SessionAttribute(Define.PRINCIPAL) User principal) {
+		
 		if(dto.getNumber() == null || dto.getNumber().isEmpty()) {
-			throw new DataDeleveryException(Define.ENTER_YOUR_ACCOUNT_NUMBER, HttpStatus.BAD_REQUEST);
+			throw new DataDeleveryException("계좌 번호를 입력하세요", HttpStatus.BAD_REQUEST);
 		}
+		
 		if(dto.getPassword() == null || dto.getPassword().isEmpty()) {
-			throw new DataDeleveryException(Define.ENTER_YOUR_PASSWORD, HttpStatus.BAD_REQUEST);
-		}
-		if(dto.getBalance() == null || dto.getBalance() < 0) {
-			throw new DataDeleveryException(Define.ENTER_YOUR_BALANCE, HttpStatus.BAD_REQUEST);
+			throw new DataDeleveryException("계좌 비밀번호를 입력하세요", HttpStatus.BAD_REQUEST);
 		}
 		
+		if(dto.getBalance() == null || dto.getBalance() <= 0) {
+			throw new DataDeleveryException("계좌 잔액을 입력하세요", HttpStatus.BAD_REQUEST);
+		}
 		accountService.createAccount(dto, principal.getId());
-		
 		return "redirect:/index"; 
 	}
+	
 	
 	/**
 	 * 계좌 목록 화면 요청
@@ -90,13 +88,8 @@ public class AccountController {
 	 * @return
 	 */
 	@GetMapping({"/list", "/"})
-	public String listPage(Model model) {
+	public String listPage(Model model, @SessionAttribute(Define.PRINCIPAL) User principal) {
 		
-		User principal = (User)session.getAttribute(Define.PRINCIPAL);
-		System.out.println("111111111111");
-		if(principal == null) {
-			throw new UnAuthorizedException(Define.NOT_AN_AUTHENTICATED_USER, HttpStatus.UNAUTHORIZED);
-		}
 		List<Account> accountList = accountService.readAccountListByUserId(principal.getId());
 		if(accountList.isEmpty()) {
 			model.addAttribute("accountList", null);
@@ -112,10 +105,6 @@ public class AccountController {
 	 */
 	@GetMapping("/withdrawal")
 	public String withdrawalPage() {
-		User principal = (User)session.getAttribute(Define.PRINCIPAL);
-		if(principal == null) {
-			throw new UnAuthorizedException(Define.NOT_AN_AUTHENTICATED_USER, HttpStatus.UNAUTHORIZED);
-		}
 		return "account/withdrawal";
 	}
 	
@@ -124,12 +113,7 @@ public class AccountController {
 	 * @return
 	 */
 	@PostMapping("/withdrawal")
-	public String withdrawalProc(WithdrawalDTO dto) {
-		User principal = (User)session.getAttribute(Define.PRINCIPAL);
-		if(principal == null) {
-			throw new UnAuthorizedException(Define.NOT_AN_AUTHENTICATED_USER, HttpStatus.UNAUTHORIZED);
-		}
-		
+	public String withdrawalProc(WithdrawalDTO dto, @SessionAttribute(Define.PRINCIPAL) User principal) {
 		// 유효성 검사 (자바 코드를 개발) --> 스프링 부트 @Valid 라이브러리 존재
 		if(dto.getAmount() == null ) {
 			throw new DataDeleveryException(Define.ENTER_YOUR_BALANCE, HttpStatus.BAD_REQUEST);
@@ -154,10 +138,6 @@ public class AccountController {
 	 */
 	@GetMapping("/deposit")
 	public String depositPage() {
-		User principal = (User)session.getAttribute(Define.PRINCIPAL);
-		if(principal == null) {
-			throw new UnAuthorizedException(Define.NOT_AN_AUTHENTICATED_USER, HttpStatus.UNAUTHORIZED);
-		}
 		return "account/deposit";
 	}
 	
@@ -169,11 +149,7 @@ public class AccountController {
 	 * @return account/list
 	 */
 	@PostMapping("/deposit")
-	public String depositProc(DepositDTO dto) {
-		User principal = (User)session.getAttribute(Define.PRINCIPAL);
-		if(principal == null) {
-			throw new UnAuthorizedException(Define.NOT_AN_AUTHENTICATED_USER, HttpStatus.UNAUTHORIZED);
-		}
+	public String depositProc(DepositDTO dto, @SessionAttribute(Define.PRINCIPAL) User principal) {
 		if(dto.getAmount().longValue() <= 0) {
 			throw new DataDeleveryException(Define.D_BALANCE_VALUE, HttpStatus.BAD_REQUEST);
 		}
@@ -192,10 +168,7 @@ public class AccountController {
 	 */
 	@GetMapping("/transfer")
 	public String transferPage() {
-		User principal = (User)session.getAttribute(Define.PRINCIPAL);
-		if(principal == null) {
-			throw new UnAuthorizedException(Define.NOT_AN_AUTHENTICATED_USER, HttpStatus.UNAUTHORIZED);
-		}
+		
 		return "account/transfer";
 	}
 	
@@ -204,11 +177,7 @@ public class AccountController {
 	 * 이체 기능 요청
 	 */
 	@PostMapping("/transfer")
-	public String transferProc(TransferDTO dto) {
-		User principal = (User)session.getAttribute(Define.PRINCIPAL);
-		if(principal == null) {
-			throw new UnAuthorizedException(Define.NOT_AN_AUTHENTICATED_USER, HttpStatus.UNAUTHORIZED);
-		}
+	public String transferProc(TransferDTO dto, @SessionAttribute(Define.PRINCIPAL) User principal) {
 		if(dto.getAmount() == null) {
 			throw new DataDeleveryException(Define.ENTER_YOUR_BALANCE, HttpStatus.BAD_REQUEST);
 		}
@@ -240,10 +209,6 @@ public class AccountController {
 						@RequestParam(name ="siez", defaultValue = "2") int size, 
 						Model model) {
 		
-		User principal = (User)session.getAttribute(Define.PRINCIPAL);
-		if(principal == null) {
-			throw new UnAuthorizedException(Define.NOT_AN_AUTHENTICATED_USER, HttpStatus.UNAUTHORIZED);
-		} 
 		
 		System.out.println("account : " + accountId);
 		System.out.println("type : " + type);
